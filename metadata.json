@@ -1,0 +1,6 @@
+{
+  "name": "CinéIA Studio",
+  "description": "Studio mobile de création de films par IA (scénario, images clés, vidéos et assemblage)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

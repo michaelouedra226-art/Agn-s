@@ -1,11 +1,22 @@
-<div align="center">
+# CinéIA Studio Mobile
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Application Android de création cinématographique par Intelligence Artificielle (Gemini & Agnes).
 
-  <h1>Built with AI Studio</h2>
+## Architecture
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- **Architecture** : MVVM + Clean Architecture avec Coroutines et Flow
+- **UI** : Jetpack Compose avec Material Design 3, animations custom et fond cinéma dynamique 3 couches
+- **Base de données** : Room (SQLite) avec DAO réactifs
+- **Réseau & API** : Retrofit + OkHttp avec Rate Limiter (Token Bucket), gestion des 429 et reprise sur incident
+- **Chargement Médias** : Coil pour le cache d'images et lecteur vidéo natif haute performance
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Compilation locale
 
-</div>
+```bash
+./scripts/fix-executable-permissions.sh
+./gradlew clean assembleDebug
+```
+
+## Intégration Continue (CI)
+
+Le workflow GitHub Actions `.github/workflows/android.yml` assure la compilation automatique et la génération de l'APK debug sous Java 21 et Android SDK 36.1.
