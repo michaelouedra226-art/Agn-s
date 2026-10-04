@@ -40,6 +40,25 @@ class GeminiApiClient(
         private const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
     }
 
+    suspend fun testApiKey(): String = withContext(Dispatchers.IO) {
+        val apiKey = apiKeyManager.getGeminiApiKey().trim()
+        if (apiKey.isBlank()) throw IllegalStateException("Entrez une clé Google AI Studio.")
+        val request = Request.Builder()
+            .url("https://generativelanguage.googleapis.com/v1beta/models")
+            .header("x-goog-api-key", apiKey)
+            .get()
+            .build()
+        client.newCall(request).execute().use { response ->
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                val message = runCatching { JSONObject(body).optJSONObject("error")?.optString("message") }.getOrNull().orEmpty()
+                throw IllegalStateException("Google a refusé la clé (HTTP ${response.code}). ${message.take(220)}")
+            }
+            val count = runCatching { JSONObject(body).optJSONArray("models")?.length() ?: 0 }.getOrDefault(0)
+            "Clé reconnue par Google" + if (count > 0) " ($count modèles listés)." else "."
+        }
+    }
+
     suspend fun generateFilmScript(
         idea: String,
         language: String,
@@ -94,9 +113,10 @@ class GeminiApiClient(
             })
         }
 
-        val requestUrl = "$BASE_URL/$MODEL:generateContent?key=$apiKey"
+        val requestUrl = "$BASE_URL/$MODEL:generateContent"
         val request = Request.Builder()
             .url(requestUrl)
+            .header("x-goog-api-key", apiKey)
             .post(jsonBody.toString().toRequestBody("application/json".toMediaType()))
             .build()
 
@@ -146,9 +166,10 @@ class GeminiApiClient(
             })
         }
 
-        val requestUrl = "$BASE_URL/$MODEL:generateContent?key=$apiKey"
+        val requestUrl = "$BASE_URL/$MODEL:generateContent"
         val request = Request.Builder()
             .url(requestUrl)
+            .header("x-goog-api-key", apiKey)
             .post(jsonBody.toString().toRequestBody("application/json".toMediaType()))
             .build()
 

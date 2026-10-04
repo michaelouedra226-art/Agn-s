@@ -15,9 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,7 +63,7 @@ fun VideoScreen(
     val scrollState = rememberScrollState()
 
     val cameraMovements = listOf("Statique", "Zoom in", "Zoom out", "Pan", "Orbite", "Dolly", "Tilt", "Rotate")
-    val durations = listOf(Pair("3s", 3.0), Pair("5s", 5.0), Pair("6.4s", 6.4), Pair("10s", 10.0), Pair("18s", 18.0))
+    val durations = listOf(Pair("4s", 4.0), Pair("6s", 6.0), Pair("8s", 8.0))
     val resolutions = listOf("720p", "1080p")
 
     Column(
@@ -174,10 +173,8 @@ fun VideoScreen(
                         .clip(RoundedCornerShape(12.dp))
                         .background(CinColors.BgElevated)
                         .border(1.dp, CinColors.BorderDefault, RoundedCornerShape(12.dp))
-                        .clickable {
-                            // Suggest latest recent image or open gallery
-                            val recent = uiState.recentVideos.firstOrNull()?.path
-                            viewModel.setImageSource(recent)
+                        .clickable(enabled = uiState.recentImages.isNotEmpty()) {
+                            viewModel.setImageSource(uiState.recentImages.firstOrNull()?.path)
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -190,10 +187,41 @@ fun VideoScreen(
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = "Touchez pour sélectionner une image à animer",
+                            text = if (uiState.recentImages.isEmpty()) "Générez d’abord une image dans l’onglet Image" else "Touchez pour utiliser votre image la plus récente",
                             color = CinColors.TextSecond,
                             fontSize = 13.sp
                         )
+                    }
+                }
+            }
+            if (uiState.recentImages.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Images récentes — touchez pour choisir",
+                    color = CinColors.TextSecond,
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(uiState.recentImages, key = { it.id }) { image ->
+                        Box(
+                            modifier = Modifier
+                                .size(width = 104.dp, height = 76.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .border(
+                                    2.dp,
+                                    if (image.path == uiState.selectedImageSourcePath) CinColors.AccentPink else CinColors.BorderDefault,
+                                    RoundedCornerShape(10.dp)
+                                )
+                                .clickable { viewModel.setImageSource(image.path) }
+                        ) {
+                            AsyncImage(
+                                model = File(image.path),
+                                contentDescription = "Choisir ${image.title}",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                 }
             }
@@ -297,6 +325,11 @@ fun VideoScreen(
                 )
             }
         }
+        Text(
+            text = "Veo accepte 4, 6 ou 8 secondes ; la résolution 1080p nécessite 8 secondes.",
+            color = CinColors.TextTertiary,
+            fontSize = 11.sp
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -34,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.design.CinButton
@@ -70,7 +70,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Clés d'API & Moteurs IA",
+                        text = "Connexion Google Gemini",
                         color = CinColors.TextPrimary,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
@@ -81,7 +81,7 @@ fun SettingsScreen(
 
                 // Gemini API Key
                 Text(
-                    text = "✨ Clé Google Gemini (Scénario)",
+                    text = "✨ Clé Google AI Studio / Gemini",
                     color = CinColors.TextPrimary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
@@ -90,8 +90,15 @@ fun SettingsScreen(
                 CinInput(
                     value = uiState.geminiKeyInput,
                     onValueChange = viewModel::onGeminiKeyChange,
-                    placeholder = "AIzaSy...",
-                    testTag = "gemini_key_input"
+                    placeholder = "Collez votre clé Google AI Studio",
+                    testTag = "gemini_key_input",
+                    visualTransformation = PasswordVisualTransformation()
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Cette clé sert aux scénarios, aux images Gemini et aux vidéos Veo 3.1. La génération vidéo dépend de l’accès et du quota de votre compte Google.",
+                    color = CinColors.TextTertiary,
+                    fontSize = 11.sp
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(
@@ -117,47 +124,6 @@ fun SettingsScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
-                HorizontalDivider(color = CinColors.BorderDefault)
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Agnes API Key
-                Text(
-                    text = "🎥 Clé Agnes Studio (Diffusion Vidéo)",
-                    color = CinColors.TextPrimary,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                CinInput(
-                    value = uiState.agnesKeyInput,
-                    onValueChange = viewModel::onAgnesKeyChange,
-                    placeholder = "sk-agnes-...",
-                    testTag = "agnes_key_input"
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (uiState.agnesTestResult != null) {
-                        Text(
-                            text = uiState.agnesTestResult!!,
-                            color = if (uiState.agnesTestResult!!.startsWith("✓")) CinColors.Success else CinColors.Danger,
-                            fontSize = 11.sp
-                        )
-                    } else {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                    CinButton(
-                        text = if (uiState.isTestingAgnes) "Test..." else "Tester",
-                        onClick = viewModel::testAgnesKey,
-                        style = CinButtonStyle.SECONDARY,
-                        modifier = Modifier.height(36.dp),
-                        loading = uiState.isTestingAgnes
-                    )
-                }
             }
         }
 
@@ -262,7 +228,7 @@ fun SettingsScreen(
                     fontSize = 12.sp
                 )
                 Text(
-                    text = "Moteur : Gemini 2.5 Flash + Agnes Video 2.0",
+                    text = "Moteurs : Gemini Flash Image + Veo 3.1",
                     color = CinColors.TextSecond,
                     fontSize = 12.sp
                 )

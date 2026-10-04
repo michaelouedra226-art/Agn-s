@@ -30,13 +30,13 @@ object RateLimiter {
     private val mutex = Mutex()
 
     val GEMINI = "gemini"
-    val AGNES_IMAGE = "agnes_image"
-    val AGNES_VIDEO = "agnes_video"
+    val GEMINI_IMAGE = "gemini_image"
+    val GEMINI_VIDEO = "gemini_video"
 
     private val rules = mapOf(
         GEMINI to RateLimitRule(GEMINI, rpm = 10, rpd = 250, burst = 3, cooldownMs = 30_000),
-        AGNES_IMAGE to RateLimitRule(AGNES_IMAGE, rpm = 4, rpd = 200, burst = 2, cooldownMs = 60_000),
-        AGNES_VIDEO to RateLimitRule(AGNES_VIDEO, rpm = 1, rpd = 100, burst = 1, cooldownMs = 90_000)
+        GEMINI_IMAGE to RateLimitRule(GEMINI_IMAGE, rpm = 4, rpd = 200, burst = 2, cooldownMs = 60_000),
+        GEMINI_VIDEO to RateLimitRule(GEMINI_VIDEO, rpm = 1, rpd = 100, burst = 1, cooldownMs = 90_000)
     )
 
     private val requestTimestamps = mutableMapOf<String, MutableList<Long>>()

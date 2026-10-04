@@ -15,6 +15,9 @@ class ApiKeyManager(context: Context) {
     fun getGeminiApiKey(): String {
         val userKey = prefs.getString(KEY_GEMINI, "") ?: ""
         if (userKey.isNotBlank()) return userKey
+        // Migrate an older installation if a Google AI Studio key was entered in the retired Agnes field.
+        val legacyGoogleKey = prefs.getString(KEY_AGNES, "")?.trim().orEmpty()
+        if (legacyGoogleKey.startsWith("AIza")) return legacyGoogleKey
         return try {
             val buildKey = BuildConfig.GEMINI_API_KEY
             if (buildKey.isNotBlank() && !buildKey.contains("MY_GEMINI_API_KEY")) buildKey else ""
@@ -25,21 +28,6 @@ class ApiKeyManager(context: Context) {
 
     fun setGeminiApiKey(key: String) {
         prefs.edit().putString(KEY_GEMINI, key.trim()).apply()
-    }
-
-    fun getAgnesApiKey(): String {
-        val userKey = prefs.getString(KEY_AGNES, "") ?: ""
-        if (userKey.isNotBlank()) return userKey
-        return try {
-            val buildKey = BuildConfig.AGNES_API_KEY
-            if (buildKey.isNotBlank() && !buildKey.contains("MY_AGNES_API_KEY")) buildKey else ""
-        } catch (e: Throwable) {
-            ""
-        }
-    }
-
-    fun setAgnesApiKey(key: String) {
-        prefs.edit().putString(KEY_AGNES, key.trim()).apply()
     }
 
     fun maskKey(key: String): String {

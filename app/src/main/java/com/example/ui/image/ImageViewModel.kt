@@ -1,10 +1,11 @@
 package com.example.ui.image
 
+import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.log.LogManager
-import com.example.data.api.AgnesApiClient
 import com.example.data.api.GeminiApiClient
+import com.example.data.api.GoogleMediaApiClient
 import com.example.data.repository.MediaRepository
 import com.example.domain.model.MediaItem
 import com.example.domain.model.MediaType
@@ -34,7 +35,7 @@ data class ImageUiState(
 
 class ImageViewModel(
     private val geminiApiClient: GeminiApiClient,
-    private val agnesApiClient: AgnesApiClient,
+    private val mediaApiClient: GoogleMediaApiClient,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
 
@@ -103,7 +104,7 @@ class ImageViewModel(
             }
 
             try {
-                val imagePath = agnesApiClient.generateImage(
+                val imagePath = mediaApiClient.generateImage(
                     prompt = prompt,
                     style = state.selectedStyle,
                     aspectRatio = state.selectedRatio,
@@ -113,6 +114,8 @@ class ImageViewModel(
                 }
 
                 val file = File(imagePath)
+                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                BitmapFactory.decodeFile(imagePath, bounds)
                 val mediaItem = MediaItem(
                     id = UUID.randomUUID().toString(),
                     type = MediaType.IMAGE,
@@ -120,8 +123,8 @@ class ImageViewModel(
                     title = prompt.take(30),
                     prompt = prompt,
                     sizeBytes = file.length(),
-                    width = if (state.selectedRatio == "1:1") 1080 else 1920,
-                    height = if (state.selectedRatio == "9:16") 1920 else 1080
+                    width = bounds.outWidth.coerceAtLeast(1),
+                    height = bounds.outHeight.coerceAtLeast(1)
                 )
 
                 mediaRepository.insertMedia(mediaItem)

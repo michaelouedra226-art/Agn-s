@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.log.LogManager
 import com.example.core.ratelimit.RateLimiter
-import com.example.data.api.AgnesApiClient
 import com.example.data.api.ApiKeyManager
 import com.example.data.api.GeminiApiClient
+import com.example.data.api.GoogleMediaApiClient
 import com.example.data.repository.FilmRepository
 import com.example.data.repository.MediaRepository
 import com.example.domain.model.Film
@@ -34,7 +34,6 @@ data class FilmUiState(
     val includeSubtitles: Boolean = true,
     val voiceType: String = "Voix Féminine Douce",
     val hasValidGeminiKey: Boolean = true,
-    val hasValidAgnesKey: Boolean = true,
 
     // Live progress state
     val currentFilm: Film? = null,
@@ -53,7 +52,7 @@ class FilmViewModel(
     private val filmRepository: FilmRepository,
     private val mediaRepository: MediaRepository,
     private val geminiApiClient: GeminiApiClient,
-    private val agnesApiClient: AgnesApiClient,
+    private val mediaApiClient: GoogleMediaApiClient,
     private val apiKeyManager: ApiKeyManager
 ) : ViewModel() {
 
@@ -70,8 +69,7 @@ class FilmViewModel(
     private fun checkApiKeys() {
         _uiState.update {
             it.copy(
-                hasValidGeminiKey = apiKeyManager.getGeminiApiKey().isNotBlank(),
-                hasValidAgnesKey = apiKeyManager.getAgnesApiKey().isNotBlank()
+                hasValidGeminiKey = apiKeyManager.getGeminiApiKey().isNotBlank()
             )
         }
     }
@@ -243,7 +241,7 @@ class FilmViewModel(
                         )
                     }
 
-                    val imagePath = agnesApiClient.generateImage(
+                    val imagePath = mediaApiClient.generateImage(
                         prompt = scene.imagePrompt,
                         style = updatedFilm.style,
                         aspectRatio = "16:9",
@@ -289,12 +287,12 @@ class FilmViewModel(
                         )
                     }
 
-                    val videoPath = agnesApiClient.generateVideo(
+                    val videoPath = mediaApiClient.generateVideo(
                         prompt = scene.videoPrompt,
                         imageSourcePath = scene.imagePath,
                         cameraMovement = scene.cameraMovement,
-                        durationSec = 6.4,
-                        resolution = "1080p"
+                        durationSec = 8.0,
+                        resolution = "720p"
                     )
 
                     val finalScene = scene.copy(

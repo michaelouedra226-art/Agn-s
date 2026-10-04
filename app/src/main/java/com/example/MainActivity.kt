@@ -50,9 +50,9 @@ import com.example.core.design.AnimatedCinemaBackground
 import com.example.core.design.CinColors
 import com.example.core.log.LogManager
 import com.example.core.ratelimit.RateLimiter
-import com.example.data.api.AgnesApiClient
 import com.example.data.api.ApiKeyManager
 import com.example.data.api.GeminiApiClient
+import com.example.data.api.GoogleMediaApiClient
 import com.example.data.database.AppDatabase
 import com.example.data.repository.FilmRepository
 import com.example.data.repository.MediaRepository
@@ -88,13 +88,13 @@ class MainActivity : ComponentActivity() {
         val settingsRepository = SettingsRepository(applicationContext)
         val apiKeyManager = ApiKeyManager(applicationContext)
         val geminiApiClient = GeminiApiClient(apiKeyManager)
-        val agnesApiClient = AgnesApiClient(applicationContext, apiKeyManager)
+        val mediaApiClient = GoogleMediaApiClient(applicationContext, apiKeyManager)
 
-        val imageViewModel = ImageViewModel(geminiApiClient, agnesApiClient, mediaRepository)
-        val videoViewModel = VideoViewModel(agnesApiClient, mediaRepository)
-        val filmViewModel = FilmViewModel(filmRepository, mediaRepository, geminiApiClient, agnesApiClient, apiKeyManager)
+        val imageViewModel = ImageViewModel(geminiApiClient, mediaApiClient, mediaRepository)
+        val videoViewModel = VideoViewModel(mediaApiClient, mediaRepository)
+        val filmViewModel = FilmViewModel(filmRepository, mediaRepository, geminiApiClient, mediaApiClient, apiKeyManager)
         val galleryViewModel = GalleryViewModel(mediaRepository)
-        val settingsViewModel = SettingsViewModel(apiKeyManager, settingsRepository)
+        val settingsViewModel = SettingsViewModel(apiKeyManager, settingsRepository, geminiApiClient)
 
         LogManager.info("Système", "CinéIA Studio démarré avec succès. Moteur prêt.")
 
